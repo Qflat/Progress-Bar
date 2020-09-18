@@ -34,3 +34,6 @@ in order to graduate from their institution (in this case, the
 institution is Olivet College) with a degree in their chosen major. 
 Please note that these graduation requirements can be found on the
 Olivet College portal to anyone holding a valid Olivet College email.
+
+NOTE: Original Excel Files not included, will be substituted with Database
+in SQL in future versions.
