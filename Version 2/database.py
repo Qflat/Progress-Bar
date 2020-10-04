@@ -71,9 +71,7 @@ class Course:
 
     def next_section(self):
         global move_on
-        print('Running')
         move_on=True
-        print(move_on)
         self.master.destroy()
 
 def create_databases():
@@ -131,28 +129,47 @@ def add_courses():
     while move_on==False:
         add=Tk()
         window=Course(add)
-        add.mainloop()
-        print('Printing again:')
-        print(move_on)    
+        add.mainloop()   
 
-class Minor:
-    def __init__(self, master):
+class Curriculum:
+    def __init__(self, master,c_type):
         self.master=master
-        master.title('Add a Minor:')
-        self.name_label=Label(master, text='Minor Name: ')
+        self.c_type=c_type
+        master.title('Add a %s:' % self.c_type)
+        self.name_label=Label(master, text='%s Name: ' % self.c_type)
         self.name_label.grid(row=0,column=0)
         self.name=Entry(master)
-        self.master.grid(row=0,column=0)
-        self.courses_label=Label(master, text='Please select the required courses to complete this minor: ')
+        self.name.grid(row=0,column=1)
+        self.courses_label=Label(master, text='Please select the required courses to complete this %s: ' % self.c_type)
         self.courses_label.grid(row=1,column=0)
-        self.all_courses=Listbox(master, selectmode="multiple")
-        self.all_courses.grid(row=1,column=1)
+        self.courses_list=Listbox(master, selectmode="multiple")
+        self.courses_list.grid(row=1,column=1)
         self.courses=[c.execute("""SELECT name FROM Courses""")]
+        self.courses=c.fetchall()
         for course in self.courses:
-            self.all_courses.insert(END, self.courses[course])
-            self.all_courses.itemconfig(course, bg="yellow" if course % 2 == 0 else "cyan")
-        
-        
+            self.courses_list.insert(END, course)
+        self.submit_button=Button(text='Submit %s' % self.c_type, command=self.submit)
+        self.submit_button.grid(row=2,column=0)
+        self.next_button=Button(text='Next Section', command=self.next)
+        self.next_button.grid(row=2,column=1)
+
+    def submit(self):
+        self.all_index=self.courses_list.get(0,END)
+        self.selected_index=self.courses_list.curselection()
+        self.selected_classes=[self.all_index[course] for course in self.selected_index]
+        self.string=("INSERT INTO %s VALUES (" % self.c_type)
+        self.string=self.string+
+        self.master.destroy()
+
+    def next(self):
+        global move_on
+        self.master.destroy()
+
+def add_curriculum(c_type):
+    c=Tk()
+    m=Curriculum(c,c_type)
+    c.mainloop()
+      
 if sys.argv[1]=='start':
     create_databases()
     add_courses()
@@ -160,9 +177,9 @@ elif sys.argv[1]=='add':
     if sys.argv[2]=='courses':
         add_courses()
     elif sys.argv[2]=='major':
-        pass
+        add_curriculum('Major')
     elif sys.argv[2]=='minor':
-        pass
+        add_curriculum('Minor')
     elif sys.argv[2]=='student':
         pass
 elif sys.argv[1]=='help':
